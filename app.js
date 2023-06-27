@@ -2,11 +2,11 @@ const path = require('path');
 
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose')
 
 const errorController = require('./controllers/error');
-const mongoConnect = require('./util/database').mongoConnect
-const User = require('./models/user')
-
+// const mongoConnect = require('./util/database').mongoConnect;
+const User = require('./models/user');
 
 const app = express();
 
@@ -22,7 +22,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use((req, res, next) => {
   User.findById('64994adb836c12c399610e95')
     .then(user => {
-      req.user = new User(user.name, user.email, user.cart, user._id)
+      req.user = new User(user.name, user.email, user.cart, user._id);
       next();
     })
     .catch(err => console.log(err));
@@ -30,10 +30,12 @@ app.use((req, res, next) => {
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
-app.use(errorController.get404)
 
-mongoConnect(() => {
+app.use(errorController.get404);
 
-  app.listen(3000)
-})
-
+mongoose.connect('mongodb+srv://dipankarzeus10:Mylovemom10@cluster0.v2es2ck.mongodb.net/?retryWrites=true&w=majority')
+  .then(result => {
+    app.listen(3000)
+  }).catch(err => {
+    console.log(err)
+  })
